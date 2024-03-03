@@ -28,6 +28,7 @@
 struct Aimbot {
     bool PredictMovement = true;
     bool PredictBulletDrop = true;
+    bool KmboxInitialized = false;
 
     float FinalDistance = 0;
 
@@ -72,6 +73,7 @@ struct Aimbot {
     _com comPort;
 
     void Initialize() {
+	KmboxInitialized = false;
         if (KmboxType == "Net") {
             std::cout << "Initializing Kmbox Net..." << std::endl;
             MinimumDelay = 1;
@@ -83,6 +85,7 @@ struct Aimbot {
             }
             else {
                 std::cout << "Kmbox Net initialized successfully." << std::endl;
+		KmboxInitialized = true;
             }
 		}
 		else if (KmboxType == "BPro") {
@@ -91,6 +94,7 @@ struct Aimbot {
 
             if (comPort.open(KmboxComPort, 115200)) {
                 std::cout << "Kmbox B+ Pro initialized successfully." << std::endl;
+		KmboxInitialized = true;
 			}
             else {
                 std::cout << "Kmbox B+ Pro failed to initialize." << std::endl;
