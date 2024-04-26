@@ -245,7 +245,7 @@ if (ImGui::Combo("Kmbox Type", &currentItem, items, IM_ARRAYSIZE(items)))
     AimAssist->KmboxType = items[currentItem];
     Config::GetInstance().Save();
 }
-if (AimAssist->KmboxType == u8"BPro")
+if (AimAssist->KmboxType == "BPro")
 {
     ImGui::Text("KmBoxComPort:");
     ImGui::InputInt("", &AimAssist->KmboxComPort);
@@ -269,7 +269,7 @@ if (AimAssist->KmboxInitialized) {
 }
 else
 {
-    ImGui::TextColored(ImVec4(1, 0, 0, 1), u8"KmBox initialization failed"); // RED
+    ImGui::TextColored(ImVec4(1, 0, 0, 1), "KmBox initialization failed"); // RED
 }
 
         ImGui::End();
