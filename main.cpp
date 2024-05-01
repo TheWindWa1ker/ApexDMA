@@ -318,8 +318,19 @@ void UpdateCore() {
             for (int i = 0; i < Players->size(); i++) {
                 Player* p = Players->at(i);
                 p->Read();
+                int32_t ValueA;
+                uint32_t ValueB;
+                int noz = 0;
+                uint64_t ValueAAddress = p->BasePointer + 0x968;
+                uint64_t ValueBAddress = p->BasePointer + 0x96c;
+                mem.Read(ValueAAddress, &ValueA,sizeof(int32_t));
+                mem.Read(ValueAAddress, &ValueB, sizeof(uint32_t));
+                if (ValueA || ValueB) {
+                    noz++;
+                    std::cout << "ValueA:" << ValueA << "\tValueB:" << ValueB << "\tPlayersNum:" << Players->size() << "\tPlayersHP:" << p->Health << "\tPlayersName:"<<p->NameBuffer<< noz<<"\n";
+                }
             }
-
+            //outputFile.close();
             // Update ESP
             ESP->Update();
 

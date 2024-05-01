@@ -18,6 +18,19 @@ constexpr uint64_t OFF_SHIELD = 0x01a0;                           //[RecvTable.D
 constexpr uint64_t OFF_MAXSHIELD = 0x01a4;                        //[RecvTable.DT_BaseEntity].m_shieldHealthMax updated 2024/04/26
 
 constexpr uint64_t OFF_INATTACK = 0x073f2c18;                     //[Buttons].in_attack updated 2024/04/26
+constexpr uint64_t OFF_IN_ZOOM = 0x073f2d88;					  //[Buttons].in_zoom updated 2024/04/12
+constexpr uint64_t OFF_IN_TOGGLE_DUCK = 0x073f2c38;				  //[Buttons].in_toggle_duck updated 2024/04/12
+constexpr uint64_t OFF_IN_FORWARD = 0x073f2b48;					  //[Buttons].in_forward updated 2024/04/12
+constexpr uint64_t OFF_IN_JUMP = 0x073f2d00;					  //[Buttons].in_jump updated 2024/04/12
+constexpr uint64_t OFF_IN_DUCK = 0x073f2df8;					  //[Buttons].in_duck updated 2024/04/12
+constexpr uint64_t OFF_IN_BACKWARD = 0x073f2b70;				  //[Buttons].in_backward updated 2024/04/12
+constexpr uint64_t OFF_IN_USE = 0x073f2d78;					      //[Buttons].in_use updated 2024/04/12
+
+constexpr uint64_t OFF_IN_DUCKSTATE = 0x29e0;				      //[DataMap.C_Player].m_duckState updated 2024/04/12
+constexpr uint64_t OFF_WALLRUNSTART = 0x3584;					  //[DataMap.C_Player].m_wallRunStartTime updated 2024/04/12
+constexpr uint64_t OFF_WALLRUNCLEAR = 0x3588;					  //[DataMap.C_Player].m_wallRunClearTime float updated 2024/04/12
+constexpr uint64_t OFF_FLAGS = 0x00c8;							  //[DataMap.C_Player].m_fFlags updated 2024/04/12
+constexpr uint64_t OFF_SKYDRIVESTATE = 0x468c;					  //[RecvTable.DT_Player].m_skydiveState updated 2024/04/12
 
 constexpr uint64_t OFF_CAMERAORIGIN = 0x1ed0;                     //[Miscellaneous].CPlayer!camera_origin updated 2024/04/26
 constexpr uint64_t OFF_STUDIOHDR = 0xff0;                         //[Miscellaneous].CBaseAnimating!m_pStudioHdr updated 2024/04/26
@@ -57,3 +70,7 @@ constexpr uint64_t OFF_GLOW_HIGHLIGHT_TYPE_SIZE = 0x34;			  //updated 2024/04/12
 constexpr long OFF_TIME_BASE = 0x2088;							  //[DataMap.C_Player].m_currentFramePlayer.timeBase updated 2024/04/26
 constexpr long OFFSET_TRAVERSAL_START_TIME = 0x2af0;			  //[DataMap.C_Player].m_traversalStartTime updated 2024/04/26
 constexpr long OFFSET_TRAVERSAL_PROGRESS = 0x2aec;                //[DataMap.C_Player].m_traversalProgress updated 2024/04/26
+
+constexpr long OFF_GRAPPLE_ACTIVE = 0x2cd0;						  //[RecvTable.DT_Player].m_grappleActive updated 2024/04/12
+constexpr long OFF_GRAPPLE = 0x2c40;							  //[RecvTable.DT_Player].m_grapple updated 2024/04/12
+constexpr long OFF_GRAPPLE_ATTACHED = 0x0048;					  //[RecvTable.DT_GrappleData].m_grappleAttached updated 2024/04/12

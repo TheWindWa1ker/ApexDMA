@@ -22,7 +22,7 @@ struct Sense {
     bool ItemGlow = false;
     // 34 = White, 35 = Blue, 36 = Purple, 37 = Gold, 38 = Red
     int MinimumItemRarity = 36;
-
+    float lastvis_aim[100];
     //Colors
     float InvisibleGlowColor[3] = { 0, 1, 0 };
     float VisibleGlowColor[3] = { 1, 0, 0 };
@@ -35,6 +35,31 @@ struct Sense {
 
     void Initialize() {
         // idk, nothing for now
+    }
+
+    void enableGlow(Player* Target, int setting_index, uint8_t inside_value, uint8_t outline_size, std::array<float, 3> highlight_parameter, float glow_dist) {
+        const unsigned char outsidevalue = 125;
+        uint64_t ptr = Target->BasePointer;
+        uint64_t g_Base = mem.OFF_BASE;
+        std::array<unsigned char, 4> highlightFunctionBits = {
+            inside_value, // InsideFunction
+            outsidevalue, // OutlineFunction: HIGHLIGHT_OUTLINE_OBJECTIVE
+            outline_size, // OutlineRadius: size * 255 / 8
+            64 // (EntityVisible << 6) | State & 0x3F | (AfterPostProcess << 7)
+        };
+        mem.Write<uint8_t>(ptr + OFF_GLOW_ENABLE, setting_index);
+        mem.Write<int>(ptr + OFF_GLOW_THROUGH_WALL, 2);
+
+        auto handle = mem.CreateScatterHandle();
+        uint64_t highlightSettingsPtr = HighlightSettingsPointer;
+
+        mem.Write<decltype(highlightFunctionBits)>(highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * setting_index + 0x0, highlightFunctionBits);
+        mem.Write<decltype(highlight_parameter)>(highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * setting_index + 0x4, highlight_parameter);
+
+        //mem.AddScatterWriteRequest(handle, highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * setting_index + 0x0, &highlightFunctionBits, sizeof(highlightFunctionBits));
+        //mem.AddScatterWriteRequest(handle, highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * setting_index + 0x4, &highlight_parameter, sizeof(highlight_parameter));
+        mem.Write<float>(ptr + 0x264, glow_dist);
+        mem.Write<int>(g_Base + OFF_GLOW_FIX, 1);
     }
 
     void setCustomGlow(Player* Target, int enable, int wall, bool isVisible)
@@ -63,15 +88,15 @@ struct Sense {
 
         if (Target->GlowThroughWall != wall) {
             uint64_t glowThroughWallAddress = basePointer + OFF_GLOW_THROUGH_WALL;
-            mem.Write<int>(glowThroughWallAddress, wall);
+            mem.Write<int>(glowThroughWallAddress, 2);
         }
 
         uint64_t highlightIdAddress = basePointer + OFF_GLOW_HIGHLIGHT_ID;
         unsigned char value = settingIndex;
         mem.Write<unsigned char>(highlightIdAddress, value);
 
-        uint64_t glowFixAddress = basePointer + OFF_GLOW_FIX;
-        mem.Write<int>(glowFixAddress, 0);
+        uint64_t glowFixAddress = mem.OFF_BASE + OFF_GLOW_FIX;
+        mem.Write<int>(glowFixAddress, 1);
     }
 
     void setHighlightSettings() {
@@ -104,6 +129,32 @@ struct Sense {
 
     }
 
+
+    void SetPlayerGlow(Player& Target, int index) {
+        //int context_id = 0;
+        int setting_index = 0;
+        std::array<float, 3> highlight_parameter = { 0, 0, 0 };
+
+        if (!Target.GlowEnable || (int)Target.GlowThroughWall != 1) {
+            float currentEntityTime = 5000.f;
+            if (!isnan(currentEntityTime) && currentEntityTime > 0.f) {
+                // set glow color
+                if (Target.IsKnocked || Target.IsDead) {  //倒地或者没活着
+                    setting_index = 80;
+                    highlight_parameter = { 0.80f, 0.78f, 0.45f };
+                }
+                else if (Target.LastVisibleTime > lastvis_aim[index] || (Target.LastVisibleTime < 0.f && lastvis_aim[index] > 0.f)) {
+                    setting_index = 81;
+                    highlight_parameter = {1,0,0};
+                }
+                else {
+                        setting_index = 82;
+                        highlight_parameter = {0,1,0};
+                    }
+                enableGlow(&Target,setting_index, 0,48, highlight_parameter, 250.f*40);
+                }
+            }
+    }
     Vector2D DummyVector = { 0, 0 };
     void Update() {
         if (Myself->IsDead) return;
@@ -129,12 +180,10 @@ struct Sense {
             if (Target->IsDummy()) continue;
             if (Target->IsLocal) continue;
             if (!Target->IsHostile) continue;
-
             if (GameCamera->WorldToScreen(Target->LocalOrigin.ModifyZ(30), DummyVector)) {
                 setCustomGlow(Target, 1, 1, Target->IsVisible);
             }
         }
-
-        setHighlightSettings();
+        
     }
 };
