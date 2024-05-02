@@ -26,7 +26,7 @@ struct Player {
     int Team;
 
     bool GlowEnable;  //true --enable
-    bool GlowThroughWall; //true --enable
+    int GlowThroughWall; //2 --enable 5 --disable
     int HighlightID;
 
     bool IsDead;

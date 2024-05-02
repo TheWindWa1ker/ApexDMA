@@ -85,7 +85,7 @@ struct Sense {
         mem.Write<int>(glowEnableAddress, glowable);
 
         uint64_t glowThroughWallAddress = TargetPtr + OFF_GLOW_THROUGH_WALL;
-        mem.Write<int>(glowThroughWallAddress, 2);
+        mem.Write<int>(glowThroughWallAddress, throughWall);
 
         uint64_t highlightIdAddress = TargetPtr + OFF_GLOW_HIGHLIGHT_ID;
         unsigned char value = settingIndex;
@@ -177,7 +177,7 @@ struct Sense {
             if (Target->IsLocal) continue;
             if (!Target->IsHostile) continue;
             if (GameCamera->WorldToScreen(Target->LocalOrigin.ModifyZ(30), DummyVector)) {
-                setCustomGlow(Target, 7, 1, Target->IsVisible);
+                setCustomGlow(Target, 7, 2, Target->IsVisible);
                 std::cout << Target->IsVisible << "/n";
             }
         }

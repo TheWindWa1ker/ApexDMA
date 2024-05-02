@@ -184,7 +184,9 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 uint64_t glowEnableAddress = player->BasePointer + OFF_GLOW_ENABLE;
                 uint64_t glowThroughWallAddress = player->BasePointer + OFF_GLOW_THROUGH_WALL;
                 uint64_t highlightIDAddress = player->BasePointer + OFF_GLOW_HIGHLIGHT_ID + 1;
-                mem.AddScatterReadRequest(handle, glowEnableAddress, &player->GlowEnable, sizeof(int));
+                uint8_t glowflag;
+                mem.AddScatterReadRequest(handle, glowEnableAddress, &glowflag, sizeof(uint8_t));
+                player->GlowEnable = glowflag == 7;
                 mem.AddScatterReadRequest(handle, glowThroughWallAddress, &player->GlowThroughWall, sizeof(int));
                 mem.AddScatterReadRequest(handle, highlightIDAddress, &player->HighlightID, sizeof(int));
 
@@ -212,10 +214,10 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 mem.AddScatterReadRequest(handle, healthAddress, &player->Health, sizeof(int));
 
                 // Scatter read requests for Health Shield
-                uint64_t healthAddress = player->BasePointer + OFF_SHIELD;
-                mem.AddScatterReadRequest(handle, healthAddress, &player->Shield, sizeof(int));
-                uint64_t healthAddress = player->BasePointer + OFF_MAXSHIELD;
-                mem.AddScatterReadRequest(handle, healthAddress, &player->Maxshield, sizeof(int));
+                uint64_t shiledAddress = player->BasePointer + OFF_SHIELD;
+                mem.AddScatterReadRequest(handle, shiledAddress, &player->Shield, sizeof(int));
+                uint64_t maxShiledAddress = player->BasePointer + OFF_MAXSHIELD;
+                mem.AddScatterReadRequest(handle, maxShiledAddress, &player->Maxshield, sizeof(int));
                 // Scatter read request for ModelPointer
                 uint64_t modelPointerAddress = player->BasePointer + OFF_STUDIOHDR;
                 mem.AddScatterReadRequest(handle, modelPointerAddress, &player->ModelPointer, sizeof(uint64_t));
