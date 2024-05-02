@@ -20,12 +20,13 @@ struct Player {
 
     uint64_t BonePointer = 0;
 
-    char NameBuffer[8] = { 0 };
+    int NameClass;
+    char NameBuffer[32] = { 0 };
     std::string Name;
     int Team;
 
-    int GlowEnable;
-    int GlowThroughWall;
+    bool GlowEnable;  //true --enable
+    bool GlowThroughWall; //true --enable
     int HighlightID;
 
     bool IsDead;
@@ -35,15 +36,18 @@ struct Player {
     Vector3D AbsoluteVelocity;
 
     int Health;
+    int Shield;
+    int Maxshield;
 
     float ViewYaw;
+    Vector3D viewOffset;
 
     int LastTimeAimedAt;
     int LastTimeAimedAtPrevious;
     bool IsAimedAt;
 
     uint64_t LastVisibleCheckTime = 0;
-    int LastVisibleTime;
+    float LastVisibleTime;
     int LastTimeVisiblePrevious = 0;
     bool LastVisibleState = false;
     int VisCheckCount = 0;
@@ -80,19 +84,19 @@ struct Player {
     bool VisCheck() {
         uint64_t VisibleCheckTime = GetMilliseconds();
 
-        if (VisibleCheckTime >= LastVisibleCheckTime + 10) {
+        if (VisibleCheckTime >= LastVisibleCheckTime + 10) { //进行可见性判断的时间间隔，10ms以上检查一次
             LastVisibleState = false;
-            if (LastVisibleTime > LastTimeVisiblePrevious) {
+            if (LastVisibleTime > LastTimeVisiblePrevious) { //即上次可见的时间比上次检查之前更晚,即可见
                 LastVisibleState = true;
                 VisCheckCount = 0;
             }
-            else if (LastVisibleTime < 0 && LastTimeVisiblePrevious > 0) {
+            else if (LastVisibleTime < 0 && LastTimeVisiblePrevious > 0) {  //上次检查之前人物不可见，但在上次检查之后可见
                 LastVisibleState = true;
                 VisCheckCount = 0;
             }
-            else if(LastVisibleTime == LastTimeVisiblePrevious) {
+            else if(LastVisibleTime == LastTimeVisiblePrevious) {  //人物状态没有改变，将 VisCheckCount 加 1
                 VisCheckCount++;
-                if (VisCheckCount < VisCheckThreshold) {
+                if (VisCheckCount < VisCheckThreshold) {            //如果 VisCheckCount 小于阈值 VisCheckThreshold(10)
                     LastVisibleState = true;
                 }
             }
@@ -102,7 +106,7 @@ struct Player {
 
         return LastVisibleState;
     }
-
+    
     void ValidCheck() {
         if (Valid) {
             if (Valid > 0x7FFFFFFEFFFF || Valid < 0x7FF000000000) {
@@ -116,6 +120,7 @@ struct Player {
         if (!mem.IsValidPointer(BasePointer)) { BasePointer = 0; return; }
         if (!IsPlayer() && !IsDummy()) { BasePointer = 0; return; }
 
+        
         IsAimedAt = LastTimeAimedAtPrevious < LastTimeAimedAt;
         LastTimeAimedAtPrevious = LastTimeAimedAt;
 
@@ -144,7 +149,7 @@ struct Player {
     }
 
     bool IsPlayer() {
-        return Name == "player";
+        return NameClass == 125780153691248;
     }
 
     bool IsDummy() {

@@ -38,6 +38,7 @@ constexpr uint64_t OFF_BONES = 0x0da0 + 0x48;                     //[RecvTable.D
 
 constexpr uint64_t OFF_LOCAL_ORIGIN = 0x017c;                     //[DataMap.C_BaseEntity].m_vecAbsOrigin updated 2024/04/26
 constexpr uint64_t OFF_ABSVELOCITY = 0x0170;                      //[DataMap.C_BaseEntity].m_vecAbsVelocity updated 2024/04/26
+constexpr uint64_t OFF_VIEW_OFFSET = 0x00e8;					  //[DataMap.C_BaseEntity].m_currentFrame.viewOffset updated 2024/04/12
 
 constexpr uint64_t OFF_ZOOMING = 0x1bd1;                          //[RecvTable.DT_Player].m_bZooming updated 2024/04/26
 constexpr uint64_t OFF_TEAM_NUMBER = 0x0328;                      //[RecvTable.DT_BaseEntity].m_iTeamNum updated 2024/04/26

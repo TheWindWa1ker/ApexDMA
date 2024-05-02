@@ -62,12 +62,12 @@ struct Sense {
         mem.Write<int>(g_Base + OFF_GLOW_FIX, 1);
     }
 
-    void setCustomGlow(Player* Target, int enable, int wall, bool isVisible)
+    void setCustomGlow(Player* Target, int glowable, int throughWall, bool isVisible)
     {
         if (Target->GlowEnable == 0 && Target->GlowThroughWall == 0 && Target->HighlightID == 0) {
 			return;
 		}
-        uint64_t basePointer = Target->BasePointer;
+        uint64_t TargetPtr = Target->BasePointer;
 
         int settingIndex = 65;
         std::array<float, 3> glowColorRGB = { 0, 0, 0 };
@@ -81,17 +81,13 @@ struct Sense {
             glowColorRGB = { VisibleGlowColor[0], VisibleGlowColor[1], VisibleGlowColor[2] }; // Visible Enemies
         }
 
-        if (Target->GlowEnable != enable) {
-            uint64_t glowEnableAddress = basePointer + OFF_GLOW_ENABLE;
-            mem.Write<int>(glowEnableAddress, enable);
-        }
+        uint64_t glowEnableAddress = TargetPtr + OFF_GLOW_ENABLE;
+        mem.Write<int>(glowEnableAddress, glowable);
 
-        if (Target->GlowThroughWall != wall) {
-            uint64_t glowThroughWallAddress = basePointer + OFF_GLOW_THROUGH_WALL;
-            mem.Write<int>(glowThroughWallAddress, 2);
-        }
+        uint64_t glowThroughWallAddress = TargetPtr + OFF_GLOW_THROUGH_WALL;
+        mem.Write<int>(glowThroughWallAddress, 2);
 
-        uint64_t highlightIdAddress = basePointer + OFF_GLOW_HIGHLIGHT_ID;
+        uint64_t highlightIdAddress = TargetPtr + OFF_GLOW_HIGHLIGHT_ID;
         unsigned char value = settingIndex;
         mem.Write<unsigned char>(highlightIdAddress, value);
 
@@ -181,7 +177,8 @@ struct Sense {
             if (Target->IsLocal) continue;
             if (!Target->IsHostile) continue;
             if (GameCamera->WorldToScreen(Target->LocalOrigin.ModifyZ(30), DummyVector)) {
-                setCustomGlow(Target, 1, 1, Target->IsVisible);
+                setCustomGlow(Target, 7, 1, Target->IsVisible);
+                std::cout << Target->IsVisible << "/n";
             }
         }
         

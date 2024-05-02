@@ -17,8 +17,8 @@
 二维视角向量
 
 偏航角度
-武器索引
-
+武器id
+...
 */
 struct LocalPlayer {
     uint64_t BasePointer;
@@ -57,8 +57,8 @@ struct LocalPlayer {
     int duckState;              //向下蹲1 完全蹲下2 起身过程3 其他0
     int forewardState;          //按w时33，其他0 滚轮前进不触发
     int forceForeward;          //按下w是1 其他0
-    float TraversalTimeStart;
-    float TraversalTimeProgress;
+    float TraversalTimeStart;   //未使用 sg可用
+    float TraversalTimeProgress; //未使用
 
     void ResetPointer() {
         BasePointer = 0;
@@ -71,7 +71,7 @@ struct LocalPlayer {
 			return false;
 		}
 	}
-    //玩家实体信息在类方法中使用分散读取统一读取
+    //本地玩家实体信息在结构体read方法中使用分散读取统一读取
     void Read() {
         if (!mem.IsValidPointer(BasePointer)) return;
 
