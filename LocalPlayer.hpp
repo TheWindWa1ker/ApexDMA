@@ -135,16 +135,30 @@ struct LocalPlayer {
         //没死倒地并且有武器的时候继续读取武器信息
 
         if (!IsDead && !IsKnocked) {
-            mem.AddScatterReadRequest(handle, BasePointer + OFF_WALLRUNSTART, &wallrunStart, sizeof(float));
-            mem.AddScatterReadRequest(handle, BasePointer + OFF_WALLRUNCLEAR, &wallrunClear, sizeof(float));
-            mem.AddScatterReadRequest(handle, BasePointer + OFF_SKYDRIVESTATE, &skyDriveState, sizeof(int));
-            mem.AddScatterReadRequest(handle, mem.OFF_BASE + OFF_IN_BACKWARD, &backWardState, sizeof(int));
-            mem.AddScatterReadRequest(handle, BasePointer + OFF_IN_DUCKSTATE, &duckState, sizeof(int));
-            mem.AddScatterReadRequest(handle, mem.OFF_BASE + OFF_IN_FORWARD, &forewardState, sizeof(int));
-            mem.AddScatterReadRequest(handle, mem.OFF_BASE + OFF_IN_FORWARD + 0x8, &forceForeward, sizeof(int));
+            uint64_t wallrunstartAddress = BasePointer + OFF_WALLRUNSTART;
+            mem.AddScatterReadRequest(handle, wallrunstartAddress, &wallrunStart, sizeof(float));
+
+            uint64_t wallrunclearAddress = BasePointer + OFF_WALLRUNCLEAR;
+            mem.AddScatterReadRequest(handle, wallrunclearAddress, &wallrunClear, sizeof(float));
+
+            uint64_t skydrivestateAddress = BasePointer + OFF_SKYDRIVESTATE;
+            mem.AddScatterReadRequest(handle, skydrivestateAddress, &skyDriveState, sizeof(int));
+
+            uint64_t inbackwardAddress = mem.OFF_BASE + OFF_IN_BACKWARD;
+            mem.AddScatterReadRequest(handle, inbackwardAddress, &backWardState, sizeof(int));
+
+            uint64_t induckstateAddress = BasePointer + OFF_IN_DUCKSTATE;
+            mem.AddScatterReadRequest(handle, induckstateAddress, &duckState, sizeof(int));
+
+            uint64_t inforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD;
+            mem.AddScatterReadRequest(handle, inforwardAddress, &forewardState, sizeof(int));
+
+            uint64_t inforceforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD + 0x8;
+            mem.AddScatterReadRequest(handle, inforceforwardAddress, &forceForeward, sizeof(int));
             //抓钩
             uint64_t grppleActivedAddress = BasePointer + OFF_GRAPPLE_ACTIVE;
             mem.AddScatterReadRequest(handle, grppleActivedAddress, &IsGrppleActived, sizeof(bool));
+
             uint64_t grppleStateAddress = BasePointer + OFF_GRAPPLE + OFF_GRAPPLE_ATTACHED;
             mem.AddScatterReadRequest(handle, grppleStateAddress, &IsGrppleAttached, sizeof(bool));
             // Execute the scatter read

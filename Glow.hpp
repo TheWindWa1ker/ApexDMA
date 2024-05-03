@@ -99,8 +99,8 @@ struct Sense {
         int InvisibleIndex = 65; // Invis
         int VisibleIndex = 70; // Vis
         std::array<unsigned char, 4> highlightFunctionBits = {
-            109,   // InsideFunction							2
-            6, // OutlineFunction: HIGHLIGHT_OUTLINE_OBJECTIVE			125
+            2,   // InsideFunction							2
+            64, // OutlineFunction: HIGHLIGHT_OUTLINE_OBJECTIVE			125
             64,  // OutlineRadius: size * 255 / 8				64
             64   // (EntityVisible << 6) | State & 0x3F | (AfterPostProcess << 7) 	64
         };

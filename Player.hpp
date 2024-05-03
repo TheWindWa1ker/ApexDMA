@@ -23,6 +23,7 @@ struct Player {
     int NameClass;
     char NameBuffer[32] = { 0 };
     std::string Name;
+    int PlayerID;
     int Team;
 
     bool GlowEnable;  //true --enable
