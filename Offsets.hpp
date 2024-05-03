@@ -7,7 +7,7 @@ constexpr uint64_t OFF_LOCAL_PLAYER = 0x21830f8;                  //[Miscellaneo
 constexpr uint64_t OFF_ENTITY_LIST = 0x01dd4550 + 0xA8;           //[ConVars].gamepad_aim_assist_melee updated 2024/05/03 # [Miscellaneous].cl_entitylist
 
 constexpr uint64_t OFF_NAME_LIST = 0xC5D9FD0;                     //[Miscellaneous].NameList updated 2024/04/09
-constexpr uint64_t OFF_NAME_INDEX = 0x38;                         //nameIndex
+constexpr uint64_t OFF_NAME_INDEX = 0x057c;                       //[RecvTable.DT_BaseEntity].m_instanceNameIndex
 
 constexpr uint64_t OFF_VIEWRENDER = 0x73f1978;                    //[Miscellaneous].ViewRender updated 2024/05/03
 constexpr uint64_t OFF_VIEWMATRIX = 0x11a350;                     //[Miscellaneous].ViewMatrix updated 2024/05/03

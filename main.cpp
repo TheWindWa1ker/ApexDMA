@@ -97,15 +97,17 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
             // Scatter read request for NameBuffer
             uint64_t nameBufferAddress = player->BasePointer + OFF_NAME;
             mem.AddScatterReadRequest(handle, nameBufferAddress, &player->NameClass, sizeof(int));
-
+            
             uint64_t uesrIDAddress = player->BasePointer + OFF_PLATFORM_UID;
             mem.AddScatterReadRequest(handle, uesrIDAddress, &player->PlayerID, sizeof(int));
 
             uint64_t nameIndex = 0;
+            uint64_t namePointer = 0;
             uint64_t nameIndexPointerAddress = player->BasePointer + OFF_NAME_INDEX;
             mem.AddScatterReadRequest(handle, nameIndexPointerAddress, &nameIndex, sizeof(uint64_t));
-            uint64_t namePointerAddress = mem.OFF_BASE + OFF_NAME_LIST + (nameIndex-1)<<24;
-            mem.AddScatterReadRequest(handle, namePointerAddress, &player->NameBuffer, sizeof(player->NameBuffer));
+            uint64_t namePointerAddress = mem.OFF_BASE + OFF_NAME_LIST + (nameIndex-1) * 24;
+            mem.AddScatterReadRequest(handle, namePointerAddress, &namePointer, sizeof(uint64_t));
+            mem.AddScatterReadRequest(handle, namePointer, &player->NameBuffer, sizeof(player->NameBuffer));
             // Scatter read request for Team
             uint64_t teamAddress = player->BasePointer + OFF_TEAM_NUMBER;
             mem.AddScatterReadRequest(handle, teamAddress, &player->Team, sizeof(int));
@@ -189,9 +191,7 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 uint64_t glowEnableAddress = player->BasePointer + OFF_GLOW_ENABLE;
                 uint64_t glowThroughWallAddress = player->BasePointer + OFF_GLOW_THROUGH_WALL;
                 uint64_t highlightIDAddress = player->BasePointer + OFF_GLOW_HIGHLIGHT_ID + 1;
-                int glowflag;
-                mem.AddScatterReadRequest(handle, glowEnableAddress, &glowflag, sizeof(int));
-                player->GlowEnable = glowflag == 7;
+                mem.AddScatterReadRequest(handle, glowEnableAddress, &player->GlowEnable, sizeof(int));
                 mem.AddScatterReadRequest(handle, glowThroughWallAddress, &player->GlowThroughWall, sizeof(int));
                 mem.AddScatterReadRequest(handle, highlightIDAddress, &player->HighlightID, sizeof(int));
 

@@ -21,12 +21,12 @@ struct Player {
     uint64_t BonePointer = 0;
 
     int NameClass;
-    char NameBuffer[32] = { 0 };
+    char NameBuffer[64] = { 0 };
     std::string Name;
     int PlayerID;
     int Team;
 
-    bool GlowEnable;  //true --enable
+    int GlowEnable;  //true --enable
     int GlowThroughWall; //2 --enable 5 --disable
     int HighlightID;
 
