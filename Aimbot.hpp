@@ -60,7 +60,7 @@ struct Aimbot {
         this->GameCamera = Cam;
     }
 
-    std::array<int, 4> Shotguns = { 104, 96, 97, 88 };
+    std::array<int, 4> Shotguns = { 105, 97, 98, 89 };
 
     std::string KmboxType = "Net";
     char KmboxIP[24] = "192.168.2.188";

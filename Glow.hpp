@@ -84,7 +84,7 @@ struct Sense {
         if (mem.IsValidPointer(highlightSettingsPtr)) {
             auto handle = mem.CreateScatterHandle();
 
-            // visible
+            // HIGHLIGHT
             mem.AddScatterWriteRequest(handle, highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * settingIndex + 0x0, &highlightFunctionBits, sizeof(highlightFunctionBits));
             mem.AddScatterWriteRequest(handle, highlightSettingsPtr + OFF_GLOW_HIGHLIGHT_TYPE_SIZE * settingIndex + 0x4, &highlightGlowColorRGB, sizeof(highlightGlowColorRGB));
 
@@ -156,7 +156,6 @@ struct Sense {
                 setCustomGlow(Target, 1, 1, Target->IsVisible);
             }
         }
-
         //setHighlightSettings();
     }
 };

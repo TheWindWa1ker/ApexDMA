@@ -14,7 +14,7 @@
 #include "Spectator.hpp"
 #include "Profiling.hpp"
 #include "Misc.hpp"
-
+#include "Helper.hpp"
 #include "Render.hpp"
 
 
@@ -33,7 +33,9 @@ Sense* ESP = new Sense(Players, GameCamera, Myself);
 Aimbot* AimAssist = new Aimbot(Myself, Players, GameCamera);
 Spectator* Spectators = new Spectator(Players, Myself);
 Misc* Miscellanous = new Misc(Myself);
+ActionHelper* AHP = new ActionHelper(Myself);
 
+//获取地图名，本地玩家基址，发光基址等
 void MiscBaseScatter(Level* map, LocalPlayer* myself, Camera* gameCamera, Sense* esp) {
 	// Create scatter handle
 	auto handle = mem.CreateScatterHandle();
@@ -65,6 +67,7 @@ void MiscBaseScatter(Level* map, LocalPlayer* myself, Camera* gameCamera, Sense*
 	mem.CloseScatterHandle(handle);
 }
 
+// 获取所有玩家基址一次
 void PlayerBasePointerScatter(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -82,6 +85,7 @@ void PlayerBasePointerScatter(std::vector<Player*>& players) {
     mem.CloseScatterHandle(handle);
 }
 
+// 获取所有玩家的队伍id和是否player、名字（希望能用）
 void ScatterReadTeamAndName(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -142,7 +146,7 @@ void ScatterReadPlayerValidity(std::vector <Player*>& players) {
         p->ValidCheck();
     }
 }
-
+//获取每个玩家的属性
 void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -156,6 +160,7 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
         }
 
         // Verify that the BasePointer is not 0 before adding scatter read requests
+        //实体基址有效且是玩家则获取 是否死亡 是否倒地 速度 发光相关 Visibility Yaw
         if (mem.IsValidPointer(player->BasePointer)) {
             if (player->IsPlayer()) {
                 // Scatter read request for IsDead
@@ -192,7 +197,7 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 player->IsDead = false;
                 player->IsKnocked = false;
             }
-
+            //如果是在射击场的假人或者是玩家，读取实体位置，血量，护甲，模型基址,骨骼基址
             if (player->IsDummy() && Map->IsFiringRange || player->IsPlayer()) {
                 // Scatter read request for LocalOrigin
                 uint64_t localOriginAddress = player->BasePointer + OFF_LOCAL_ORIGIN;
@@ -264,7 +269,7 @@ void UpdateCore() {
 
             // Dummy Fix
             if (Map->IsFiringRange) {
-                static auto lastExecTime = std::chrono::steady_clock::now() - std::chrono::seconds(5); // Subtract to ensure it runs the first time
+                static auto lastExecTime = std::chrono::steady_clock::now() - std::chrono::seconds(5); // 确保第一次执行时不会立即执行
 
                 // Check if 5 seconds have passed since the last execution
                 auto currentTime = std::chrono::steady_clock::now();
@@ -322,6 +327,7 @@ void UpdateCore() {
 
             // Update ESP
             ESP->Update();
+            AHP->Update();
 
             // Update AimAssist
             AimAssist->Update_TacticalReload();

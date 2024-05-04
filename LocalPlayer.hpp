@@ -5,6 +5,22 @@
 #include "Vector2D.hpp"
 #include "Vector3D.hpp"
 
+/*
+本地玩家指针
+是否死亡
+是否在射击
+是否倒地
+是否在瞄准
+抓钩
+队伍id
+三维坐标向量
+视角相机向量
+二维视角向量
+偏航角度
+武器id
+...
+*/
+
 struct LocalPlayer {
     uint64_t BasePointer;
 
@@ -12,6 +28,8 @@ struct LocalPlayer {
     bool IsInAttack;
     bool IsKnocked;
     bool IsZooming;
+    bool IsGrppleActived; //true--出勾
+    bool IsGrppleAttached; //true--勾到
 
     int Team;
     Vector3D LocalOrigin;
@@ -34,6 +52,15 @@ struct LocalPlayer {
     float TimeBase;
     float TraversalTimeStart;
     float TraversalTimeProgress;
+
+    float wallrunStart;
+    float wallrunClear;
+    int spaceFlag;              //空中状态64 蹲下67 站立65
+    int skyDriveState;
+    int backWardState;
+    int duckState;              //向下蹲1 完全蹲下2 起身过程3 其他0
+    int forewardState;          //按w时33，其他0 滚轮前进不触发
+    int forceForeward;          //按下w是1 其他0
 
     void ResetPointer() {
         BasePointer = 0;
@@ -93,6 +120,13 @@ struct LocalPlayer {
         int OffHandWeaponID;
         uint64_t offhandWeaponIDAddress = BasePointer + OFF_OFFHAND_WEAPON;
 		mem.AddScatterReadRequest(handle, offhandWeaponIDAddress, &OffHandWeaponID, sizeof(int));
+
+        //抓钩
+        uint64_t grppleActivedAddress = BasePointer + OFF_GRAPPLE_ACTIVE;
+        mem.AddScatterReadRequest(handle, grppleActivedAddress, &IsGrppleActived, sizeof(bool));
+
+        uint64_t grppleStateAddress = BasePointer + OFF_GRAPPLE + OFF_GRAPPLE_ATTACHED;
+        mem.AddScatterReadRequest(handle, grppleStateAddress, &IsGrppleAttached, sizeof(bool));
 
         // Execute the scatter read
         mem.ExecuteReadScatter(handle);

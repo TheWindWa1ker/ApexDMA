@@ -8,6 +8,13 @@
 #include "Vector2D.hpp"
 #include "Matrix.hpp"
 
+/*
+初始化屏幕中心
+更新矩阵
+玩家三维转二维（WorldToScreen）
+未使用：FOV 获取屏幕尺寸，屏幕中心
+*/
+
 struct Camera {
     Vector2D ScreenSize = Vector2D(0, 0);
     Vector2D ScreenCenter = Vector2D(ScreenSize.x / 2, ScreenSize.y / 2);

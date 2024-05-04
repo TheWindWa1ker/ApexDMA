@@ -170,6 +170,7 @@
     <ClInclude Include="DMALibrary\pch.h" />
     <ClInclude Include="Glow.hpp" />
     <ClInclude Include="GlowMode.hpp" />
+    <ClInclude Include="Helper.hpp" />
     <ClInclude Include="HidTable.hpp" />
     <ClInclude Include="HitboxType.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
