@@ -152,7 +152,7 @@ struct Sense {
             if (Target->IsLocal) continue;
             if (!Target->IsHostile) continue;
 
-            if (GameCamera->WorldToScreen(Target->LocalOrigin, DummyVector)) {
+            if (GameCamera->WorldToScreen(Target->LocalOrigin.ModifyZ(30), DummyVector)) {
                 setCustomGlow(Target, 1, 1, Target->IsVisible);
             }
         }

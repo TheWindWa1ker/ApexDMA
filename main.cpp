@@ -327,14 +327,13 @@ void UpdateCore() {
 
             // Update ESP
             ESP->Update();
-            AHP->Update();
 
             // Update AimAssist
             AimAssist->Update_TacticalReload();
             AimAssist->Update_Aimbot();
             AimAssist->Update_Triggerbot();
-
-            Miscellanous->Update();
+            AHP->Update();
+            //Miscellanous->Update();
         }
     }
     catch (const std::exception& ex) {

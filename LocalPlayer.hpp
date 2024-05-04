@@ -93,19 +93,19 @@ struct LocalPlayer {
 
         // Scatter read request for Team
         uint64_t teamAddress = BasePointer + OFF_TEAM_NUMBER;
-		mem.AddScatterReadRequest(handle, teamAddress, &Team, sizeof(int));
+        mem.AddScatterReadRequest(handle, teamAddress, &Team, sizeof(int));
 
         // Scatter read request for LocalOrigin
         uint64_t localOriginAddress = BasePointer + OFF_LOCAL_ORIGIN;
-		mem.AddScatterReadRequest(handle, localOriginAddress, &LocalOrigin, sizeof(Vector3D));
+        mem.AddScatterReadRequest(handle, localOriginAddress, &LocalOrigin, sizeof(Vector3D));
 
         // Scatter read request for CameraPosition
         uint64_t cameraPositionAddress = BasePointer + OFF_CAMERAORIGIN;
-		mem.AddScatterReadRequest(handle, cameraPositionAddress, &CameraPosition, sizeof(Vector3D));
+        mem.AddScatterReadRequest(handle, cameraPositionAddress, &CameraPosition, sizeof(Vector3D));
 
         // Scatter read request for ViewAngles
         uint64_t viewAnglesAddress = BasePointer + OFF_VIEW_ANGLES;
-		mem.AddScatterReadRequest(handle, viewAnglesAddress, &ViewAngles, sizeof(Vector2D));
+        mem.AddScatterReadRequest(handle, viewAnglesAddress, &ViewAngles, sizeof(Vector2D));
 
         // Scatter read request for ViewYaw
         uint64_t viewYawAddress = BasePointer + OFF_YAW;
@@ -114,19 +114,12 @@ struct LocalPlayer {
         // Scatter read request for WeaponHandle
         uint64_t WeaponHandle;
         uint64_t weaponHandleAddress = BasePointer + OFF_WEAPON_HANDLE;
-		mem.AddScatterReadRequest(handle, weaponHandleAddress, &WeaponHandle, sizeof(uint64_t));
+        mem.AddScatterReadRequest(handle, weaponHandleAddress, &WeaponHandle, sizeof(uint64_t));
 
         // Scatter read request for OffhandWeaponID
         int OffHandWeaponID;
         uint64_t offhandWeaponIDAddress = BasePointer + OFF_OFFHAND_WEAPON;
-		mem.AddScatterReadRequest(handle, offhandWeaponIDAddress, &OffHandWeaponID, sizeof(int));
-
-        //×¥¹³
-        uint64_t grppleActivedAddress = BasePointer + OFF_GRAPPLE_ACTIVE;
-        mem.AddScatterReadRequest(handle, grppleActivedAddress, &IsGrppleActived, sizeof(bool));
-
-        uint64_t grppleStateAddress = BasePointer + OFF_GRAPPLE + OFF_GRAPPLE_ATTACHED;
-        mem.AddScatterReadRequest(handle, grppleStateAddress, &IsGrppleAttached, sizeof(bool));
+        mem.AddScatterReadRequest(handle, offhandWeaponIDAddress, &OffHandWeaponID, sizeof(int));
 
         // Execute the scatter read
         mem.ExecuteReadScatter(handle);
@@ -169,6 +162,46 @@ struct LocalPlayer {
             // Scatter read request for IsReloading
             uint64_t isReloadingAddress = WeaponEntity + OFF_RELOADING;
             mem.AddScatterReadRequest(handle, isReloadingAddress, &IsReloading, sizeof(bool));
+
+            // Execute the scatter read
+            mem.ExecuteReadScatter(handle);
+
+            // Close the scatter handle
+            mem.CloseScatterHandle(handle);
+        }
+        if (!IsDead && !IsKnocked) {
+
+            auto handle = mem.CreateScatterHandle();
+
+            uint64_t basetimeAddress = mem.OFF_BASE + OFF_TIME_BASE;
+            mem.AddScatterReadRequest(handle, basetimeAddress, &TimeBase, sizeof(float));
+            //×¥¹³
+            uint64_t grppleActivedAddress = BasePointer + OFF_GRAPPLE_ACTIVE;
+            mem.AddScatterReadRequest(handle, grppleActivedAddress, &IsGrppleActived, sizeof(bool));
+
+            uint64_t grppleStateAddress = BasePointer + OFF_GRAPPLE + OFF_GRAPPLE_ATTACHED;
+            mem.AddScatterReadRequest(handle, grppleStateAddress, &IsGrppleAttached, sizeof(bool));
+
+            uint64_t wallrunstartAddress = BasePointer + OFF_WALLRUNSTART;
+            mem.AddScatterReadRequest(handle, wallrunstartAddress, &wallrunStart, sizeof(float));
+
+            uint64_t wallrunclearAddress = BasePointer + OFF_WALLRUNCLEAR;
+            mem.AddScatterReadRequest(handle, wallrunclearAddress, &wallrunClear, sizeof(float));
+
+            uint64_t skydrivestateAddress = BasePointer + OFF_SKYDRIVESTATE;
+            mem.AddScatterReadRequest(handle, skydrivestateAddress, &skyDriveState, sizeof(int));
+
+            uint64_t inbackwardAddress = mem.OFF_BASE + OFF_IN_BACKWARD;
+            mem.AddScatterReadRequest(handle, inbackwardAddress, &backWardState, sizeof(int));
+
+            uint64_t induckstateAddress = BasePointer + OFF_IN_DUCKSTATE;
+            mem.AddScatterReadRequest(handle, induckstateAddress, &duckState, sizeof(int));
+
+            uint64_t inforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD;
+            mem.AddScatterReadRequest(handle, inforwardAddress, &forewardState, sizeof(int));
+
+            uint64_t inforceforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD + 0x8;
+            mem.AddScatterReadRequest(handle, inforceforwardAddress, &forceForeward, sizeof(int));
 
             // Execute the scatter read
             mem.ExecuteReadScatter(handle);
