@@ -791,6 +791,22 @@ void Memory::ExecuteReadScatter(VMMDLL_SCATTER_HANDLE handle, int pid)
 	}
 }
 
+void Memory::ExecuteReadScatter2(VMMDLL_SCATTER_HANDLE handle, int pid)
+{
+	if (pid == 0)
+		pid = this->current_process.PID;
+
+	if (!VMMDLL_Scatter_ExecuteRead(handle))
+	{
+		LOG("[-] Failed to Execute Scatter Read in here\n");
+	}
+	//Clear after using it
+	if (!VMMDLL_Scatter_Clear(handle, pid, NULL))
+	{
+		LOG("[-] Failed to clear Scatter\n");
+	}
+}
+
 void Memory::ExecuteWriteScatter(VMMDLL_SCATTER_HANDLE handle, int pid)
 {
 	if (pid == 0)
@@ -798,12 +814,12 @@ void Memory::ExecuteWriteScatter(VMMDLL_SCATTER_HANDLE handle, int pid)
 
 	if (!VMMDLL_Scatter_Execute(handle))
 	{
-		LOG("[-] Failed to Execute Scatter Read\n");
+		LOG("[-] Failed to Execute Scatter Write\n");
 	}
 	//Clear after using it
 	if (!VMMDLL_Scatter_Clear(handle, pid, NULL))
 	{
-		LOG("[-] Failed to clear Scatter\n");
+		LOG("[-] Failed to clear Scatter in Write\n");
 	}
 }
 

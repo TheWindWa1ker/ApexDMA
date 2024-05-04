@@ -24,7 +24,7 @@ LocalPlayer* Myself = new LocalPlayer();
 Camera* GameCamera = new Camera();
 
 // Players
-std::vector<Player*>* HumanPlayers = new std::vector<Player*>; //创建指向vector容器的指针HumanPlayers，容器存储指向Player对象的指针
+std::vector<Player*>* HumanPlayers = new std::vector<Player*>;
 std::vector<Player*>* Dummies = new std::vector<Player*>;
 std::vector<Player*>* Players = new std::vector<Player*>;
 
@@ -34,7 +34,6 @@ Aimbot* AimAssist = new Aimbot(Myself, Players, GameCamera);
 Spectator* Spectators = new Spectator(Players, Myself);
 Misc* Miscellanous = new Misc(Myself);
 
-//获取地图名，本地玩家基址，发光基址等
 void MiscBaseScatter(Level* map, LocalPlayer* myself, Camera* gameCamera, Sense* esp) {
 	// Create scatter handle
 	auto handle = mem.CreateScatterHandle();
@@ -66,7 +65,6 @@ void MiscBaseScatter(Level* map, LocalPlayer* myself, Camera* gameCamera, Sense*
 	mem.CloseScatterHandle(handle);
 }
 
-// 获取所有玩家基址一次
 void PlayerBasePointerScatter(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -84,7 +82,6 @@ void PlayerBasePointerScatter(std::vector<Player*>& players) {
     mem.CloseScatterHandle(handle);
 }
 
-// 获取所有玩家的队伍id和是否player、名字（希望能用）
 void ScatterReadTeamAndName(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -96,18 +93,8 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
         if (mem.IsValidPointer(player->BasePointer)) {
             // Scatter read request for NameBuffer
             uint64_t nameBufferAddress = player->BasePointer + OFF_NAME;
-            mem.AddScatterReadRequest(handle, nameBufferAddress, &player->NameClass, sizeof(int));
-            
-            uint64_t uesrIDAddress = player->BasePointer + OFF_PLATFORM_UID;
-            mem.AddScatterReadRequest(handle, uesrIDAddress, &player->PlayerID, sizeof(int));
+            mem.AddScatterReadRequest(handle, nameBufferAddress, player->NameBuffer, sizeof(player->NameBuffer));
 
-            uint64_t nameIndex = 0;
-            uint64_t namePointer = 0;
-            uint64_t nameIndexPointerAddress = player->BasePointer + OFF_NAME_INDEX;
-            mem.AddScatterReadRequest(handle, nameIndexPointerAddress, &nameIndex, sizeof(uint64_t));
-            uint64_t namePointerAddress = mem.OFF_BASE + OFF_NAME_LIST + (nameIndex-1) * 24;
-            mem.AddScatterReadRequest(handle, namePointerAddress, &namePointer, sizeof(uint64_t));
-            mem.AddScatterReadRequest(handle, namePointer, &player->NameBuffer, sizeof(player->NameBuffer));
             // Scatter read request for Team
             uint64_t teamAddress = player->BasePointer + OFF_TEAM_NUMBER;
             mem.AddScatterReadRequest(handle, teamAddress, &player->Team, sizeof(int));
@@ -129,7 +116,6 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
     mem.CloseScatterHandle(handle);
 }
 
-// 标记基址有效性，暂不知用处
 void ScatterReadPlayerValidity(std::vector <Player*>& players) {
 	// Create scatter handle
 	auto handle = mem.CreateScatterHandle();
@@ -157,7 +143,6 @@ void ScatterReadPlayerValidity(std::vector <Player*>& players) {
     }
 }
 
-//获取每个玩家的属性
 void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -165,14 +150,12 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
     for (size_t i = 0; i < players.size(); ++i) {
         Player* player = players[i];
 
-        //基址有效并且不是玩家也不在射击场是什么怪东西
         if (mem.IsValidPointer(player->BasePointer) && !player->IsPlayer() && !Map->IsFiringRange) {
             player->BasePointer = 0;
             continue;
         }
 
         // Verify that the BasePointer is not 0 before adding scatter read requests
-        //实体基址有效且是玩家则获取 是否死亡 是否倒地 速度 发光相关 Visibility Yaw
         if (mem.IsValidPointer(player->BasePointer)) {
             if (player->IsPlayer()) {
                 // Scatter read request for IsDead
@@ -184,8 +167,8 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 mem.AddScatterReadRequest(handle, isKnockedAddress, &player->IsKnocked, sizeof(bool));
 
                 // Scatter read request for AbsoluteVelocity
-                uint64_t healthAddress = player->BasePointer + OFF_ABSVELOCITY;
-                mem.AddScatterReadRequest(handle, healthAddress, &player->AbsoluteVelocity, sizeof(Vector3D));
+                uint64_t absoluteVelocityAddress = player->BasePointer + OFF_ABSVELOCITY;
+                mem.AddScatterReadRequest(handle, absoluteVelocityAddress, &player->AbsoluteVelocity, sizeof(Vector3D));
 
                 // Scatter read requests for Glow
                 uint64_t glowEnableAddress = player->BasePointer + OFF_GLOW_ENABLE;
@@ -199,16 +182,17 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 uint64_t lastTimeAimedAtAddress = player->BasePointer + OFF_LAST_AIMEDAT_TIME;
                 uint64_t lastVisibleTimeAddress = player->BasePointer + OFF_LAST_VISIBLE_TIME;
                 mem.AddScatterReadRequest(handle, lastTimeAimedAtAddress, &player->LastTimeAimedAt, sizeof(int));
-                mem.AddScatterReadRequest(handle, lastVisibleTimeAddress, &player->LastVisibleTime, sizeof(float));
+                mem.AddScatterReadRequest(handle, lastVisibleTimeAddress, &player->LastVisibleTime, sizeof(int));
+
                 // Scatter read request for Yaw
                 uint64_t viewYawAddress = player->BasePointer + OFF_YAW;
                 mem.AddScatterReadRequest(handle, viewYawAddress, &player->ViewYaw, sizeof(float));
             }
             else {
                 player->IsDead = false;
-                player->IsKnocked = false; //这应该是假人的基础状态
+                player->IsKnocked = false;
             }
-            //如果是在射击场的假人或者是玩家，读取实体位置，血量，护甲，模型基址,骨骼基址
+
             if (player->IsDummy() && Map->IsFiringRange || player->IsPlayer()) {
                 // Scatter read request for LocalOrigin
                 uint64_t localOriginAddress = player->BasePointer + OFF_LOCAL_ORIGIN;
@@ -218,21 +202,17 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 uint64_t healthAddress = player->BasePointer + OFF_HEALTH;
                 mem.AddScatterReadRequest(handle, healthAddress, &player->Health, sizeof(int));
 
-                // Scatter read requests for Health Shield
-                uint64_t shiledAddress = player->BasePointer + OFF_SHIELD;
-                mem.AddScatterReadRequest(handle, shiledAddress, &player->Shield, sizeof(int));
-                uint64_t maxShiledAddress = player->BasePointer + OFF_MAXSHIELD;
-                mem.AddScatterReadRequest(handle, maxShiledAddress, &player->Maxshield, sizeof(int));
                 // Scatter read request for ModelPointer
                 uint64_t modelPointerAddress = player->BasePointer + OFF_STUDIOHDR;
                 mem.AddScatterReadRequest(handle, modelPointerAddress, &player->ModelPointer, sizeof(uint64_t));
 
 				// Scatter read request for BonePtr
-                uint64_t bonePointerAddress = player->BasePointer + OFF_BONES;
-                mem.AddScatterReadRequest(handle, bonePointerAddress, &player->BonePointer, sizeof(uint64_t));
+				uint64_t bonePointerAddress = player->BasePointer + OFF_BONES;
+				mem.AddScatterReadRequest(handle, bonePointerAddress, &player->BonePointer, sizeof(uint64_t));
             }
         }
     }
+
     // Execute the scatter read
     mem.ExecuteReadScatter(handle);
 
@@ -284,7 +264,7 @@ void UpdateCore() {
 
             // Dummy Fix
             if (Map->IsFiringRange) {
-                static auto lastExecTime = std::chrono::steady_clock::now() - std::chrono::seconds(5); // 确保第一次执行时不会立即执行
+                static auto lastExecTime = std::chrono::steady_clock::now() - std::chrono::seconds(5); // Subtract to ensure it runs the first time
 
                 // Check if 5 seconds have passed since the last execution
                 auto currentTime = std::chrono::steady_clock::now();
@@ -338,16 +318,8 @@ void UpdateCore() {
             for (int i = 0; i < Players->size(); i++) {
                 Player* p = Players->at(i);
                 p->Read();
-                int32_t ValueA;
-                uint32_t ValueB;
-                uint64_t ValueAAddress = p->BasePointer + 0x968;
-                uint64_t ValueBAddress = p->BasePointer + 0x96c;
-                mem.Read(ValueAAddress, &ValueA,sizeof(int32_t));
-                mem.Read(ValueAAddress, &ValueB, sizeof(uint32_t));
-                if (ValueA || ValueB) {
-                    std::cout << "ValueA:" << ValueA << "\tValueB:" << ValueB << "\tPlayersNum:" << Players->size() << "\tPlayersHP:" << p->Health << "\tPlayersName:"<<p->Name<<"\n";
-                }
             }
+
             // Update ESP
             ESP->Update();
 

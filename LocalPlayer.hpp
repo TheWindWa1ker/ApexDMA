@@ -4,31 +4,14 @@
 #include "DMALibrary/Memory/Memory.h"
 #include "Vector2D.hpp"
 #include "Vector3D.hpp"
-/*
-本地玩家指针
-是否死亡
-是否在射击
-是否倒地
-是否在瞄准
-抓钩
-队伍id
-三维坐标向量
-视角相机向量
-二维视角向量
 
-偏航角度
-武器id
-...
-*/
 struct LocalPlayer {
     uint64_t BasePointer;
 
-    bool IsDead; // true--死了
-    bool IsInAttack; //这个为什么放到base里读取
-    bool IsKnocked; // true--倒地
-    bool IsZooming; //true--在瞄准
-    bool IsGrppleActived; //true--出勾
-    bool IsGrppleAttached; //true--勾到
+    bool IsDead;
+    bool IsInAttack;
+    bool IsKnocked;
+    bool IsZooming;
 
     int Team;
     Vector3D LocalOrigin;
@@ -38,27 +21,19 @@ struct LocalPlayer {
     Vector2D PunchAngles;
     float ViewYaw;
 
-    int WeaponIndex; //手持武器id
-    float WeaponProjectileSpeed; //子弹射速
-    float WeaponProjectileScale; //重力参数
-    bool IsHoldingGrenade; //true--捏雷
-    bool IsReloading; //true--换弹
-    int Ammo; //当前武器使用的子弹
+    int WeaponIndex;
+    float WeaponProjectileSpeed;
+    float WeaponProjectileScale;
+    bool IsHoldingGrenade;
+    bool IsReloading;
+    int Ammo;
 
-    float ZoomFOV; //开镜fov
-    float TargetZoomFOV; //目标开镜fov??
+    float ZoomFOV;
+    float TargetZoomFOV;
 
-    float wallrunStart;
-    float wallrunClear;
     float TimeBase;
-    int spaceFlag;              //空中状态64 蹲下67 站立65
-    int skyDriveState;
-    int backWardState;
-    int duckState;              //向下蹲1 完全蹲下2 起身过程3 其他0
-    int forewardState;          //按w时33，其他0 滚轮前进不触发
-    int forceForeward;          //按下w是1 其他0
-    float TraversalTimeStart;   //未使用 sg可用
-    float TraversalTimeProgress; //未使用
+    float TraversalTimeStart;
+    float TraversalTimeProgress;
 
     void ResetPointer() {
         BasePointer = 0;
@@ -71,7 +46,7 @@ struct LocalPlayer {
 			return false;
 		}
 	}
-    //本地玩家实体信息在结构体read方法中使用分散读取统一读取
+
     void Read() {
         if (!mem.IsValidPointer(BasePointer)) return;
 
@@ -88,14 +63,6 @@ struct LocalPlayer {
         // Scatter read request for IsZooming
         uint64_t isZoomingAddress = BasePointer + OFF_ZOOMING;
         mem.AddScatterReadRequest(handle, isZoomingAddress, &IsZooming, sizeof(bool));
-
-        // Scatter read request for TimeBase
-        uint64_t baseTimeAddress = BasePointer + OFF_TIME_BASE;
-        mem.AddScatterReadRequest(handle, baseTimeAddress, &TimeBase, sizeof(float));
-
-        // Scatter read request for spaceflag
-        uint64_t spaceFlagAddress = BasePointer + OFF_FLAGS;
-        mem.AddScatterReadRequest(handle, spaceFlagAddress, &spaceFlag, sizeof(int));
 
         // Scatter read request for Team
         uint64_t teamAddress = BasePointer + OFF_TEAM_NUMBER;
@@ -117,7 +84,7 @@ struct LocalPlayer {
         uint64_t viewYawAddress = BasePointer + OFF_YAW;
         mem.AddScatterReadRequest(handle, viewYawAddress, &ViewYaw, sizeof(float));
 
-        // Scatter read request for WeaponHandle  最新的主要武器和最新的非副手武器的区别？
+        // Scatter read request for WeaponHandle
         uint64_t WeaponHandle;
         uint64_t weaponHandleAddress = BasePointer + OFF_WEAPON_HANDLE;
 		mem.AddScatterReadRequest(handle, weaponHandleAddress, &WeaponHandle, sizeof(uint64_t));
@@ -133,40 +100,6 @@ struct LocalPlayer {
         // Close the scatter handle
         mem.CloseScatterHandle(handle);
 
-        if (!IsDead && !IsKnocked) {
-            auto handle = mem.CreateScatterHandle();
-
-            uint64_t wallrunstartAddress = BasePointer + OFF_WALLRUNSTART;
-            mem.AddScatterReadRequest(handle, wallrunstartAddress, &wallrunStart, sizeof(float));
-
-            uint64_t wallrunclearAddress = BasePointer + OFF_WALLRUNCLEAR;
-            mem.AddScatterReadRequest(handle, wallrunclearAddress, &wallrunClear, sizeof(float));
-
-            uint64_t skydrivestateAddress = BasePointer + OFF_SKYDRIVESTATE;
-            mem.AddScatterReadRequest(handle, skydrivestateAddress, &skyDriveState, sizeof(int));
-
-            uint64_t inbackwardAddress = mem.OFF_BASE + OFF_IN_BACKWARD;
-            mem.AddScatterReadRequest(handle, inbackwardAddress, &backWardState, sizeof(int));
-
-            uint64_t induckstateAddress = BasePointer + OFF_IN_DUCKSTATE;
-            mem.AddScatterReadRequest(handle, induckstateAddress, &duckState, sizeof(int));
-
-            uint64_t inforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD;
-            mem.AddScatterReadRequest(handle, inforwardAddress, &forewardState, sizeof(int));
-
-            uint64_t inforceforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD + 0x8;
-            mem.AddScatterReadRequest(handle, inforceforwardAddress, &forceForeward, sizeof(int));
-            //抓钩
-            uint64_t grppleActivedAddress = BasePointer + OFF_GRAPPLE_ACTIVE;
-            mem.AddScatterReadRequest(handle, grppleActivedAddress, &IsGrppleActived, sizeof(bool));
-
-            uint64_t grppleStateAddress = BasePointer + OFF_GRAPPLE + OFF_GRAPPLE_ATTACHED;
-            mem.AddScatterReadRequest(handle, grppleStateAddress, &IsGrppleAttached, sizeof(bool));
-            // Execute the scatter read
-            mem.ExecuteReadScatter(handle);
-            // Close the scatter handle
-            mem.CloseScatterHandle(handle);
-        }
         if (!IsDead && !IsKnocked && WeaponHandle) {
             uint64_t WeaponHandleMasked = WeaponHandle & 0xffff;
             uint64_t WeaponEntity = mem.Read<uint64_t>(mem.OFF_BASE + OFF_ENTITY_LIST + (WeaponHandleMasked << 5), true);
