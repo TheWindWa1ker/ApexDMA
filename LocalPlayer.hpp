@@ -131,11 +131,10 @@ struct LocalPlayer {
         mem.ExecuteReadScatter(handle);
 
         // Close the scatter handle
-        //mem.CloseScatterHandle(handle);
-        //没死倒地并且有武器的时候继续读取武器信息
+        mem.CloseScatterHandle(handle);
 
         if (!IsDead && !IsKnocked) {
-            //auto handle = mem.CreateScatterHandle();
+            auto handle = mem.CreateScatterHandle();
 
             uint64_t wallrunstartAddress = BasePointer + OFF_WALLRUNSTART;
             mem.AddScatterReadRequest(handle, wallrunstartAddress, &wallrunStart, sizeof(float));
@@ -166,7 +165,7 @@ struct LocalPlayer {
             // Execute the scatter read
             mem.ExecuteReadScatter(handle);
             // Close the scatter handle
-            //mem.CloseScatterHandle(handle);
+            mem.CloseScatterHandle(handle);
         }
         if (!IsDead && !IsKnocked && WeaponHandle) {
             uint64_t WeaponHandleMasked = WeaponHandle & 0xffff;
@@ -174,7 +173,7 @@ struct LocalPlayer {
 
             IsHoldingGrenade = OffHandWeaponID == -251 ? true : false;
 
-            //auto handle = mem.CreateScatterHandle();
+            auto handle = mem.CreateScatterHandle();
 
             // Scatter read request for ZoomFOV
             uint64_t zoomFOVAddress = WeaponEntity + OFF_CURRENTZOOMFOV;
@@ -208,9 +207,8 @@ struct LocalPlayer {
             mem.ExecuteReadScatter(handle);
 
             // Close the scatter handle
-            //mem.CloseScatterHandle(handle);
+            mem.CloseScatterHandle(handle);
         }
-        mem.CloseScatterHandle(handle);
     }
 
     bool IsValid() {

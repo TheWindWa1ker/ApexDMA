@@ -42,7 +42,6 @@ struct Sense {
         /*if (Target->GlowEnable == 0 && Target->GlowThroughWall == 0 && Target->HighlightID == 0) {
 			return;
 		}*/
-        auto handle = mem.CreateScatterHandle();
         uint64_t TargetPtr = Target->BasePointer;
         std::array<unsigned char, 4> highlightFunctionBits = {
             2,   // InsideFunction							2
@@ -52,7 +51,7 @@ struct Sense {
         };
         int settingIndex = 65;
         std::array<float, 3> glowColorRGB = { 0, 0, 0 };
-
+        auto handle = mem.CreateScatterHandle();
         if (!isVisible) {
             settingIndex = 65;
             glowColorRGB = { InvisibleGlowColor[0], InvisibleGlowColor[1], InvisibleGlowColor[2] }; // Invisible Enemies
@@ -62,8 +61,8 @@ struct Sense {
             glowColorRGB = { VisibleGlowColor[0], VisibleGlowColor[1], VisibleGlowColor[2] }; // Visible Enemies
         }
 
-        //uint64_t glowEnableAddress = TargetPtr + OFF_GLOW_ENABLE;
-        //mem.Write<int>(glowEnableAddress, 7);
+        uint64_t glowEnableAddress = TargetPtr + OFF_GLOW_ENABLE;
+        mem.Write<int>(glowEnableAddress, glowable);
 
         uint64_t glowThroughWallAddress = TargetPtr + OFF_GLOW_THROUGH_WALL;
         mem.Write<int>(glowThroughWallAddress, throughWall);
@@ -96,7 +95,7 @@ struct Sense {
             uint64_t highlightSettingsPtr = HighlightSettingsPointer;
             if (mem.IsValidPointer(highlightSettingsPtr)) {
                 uint64_t highlightSize = OFF_GLOW_HIGHLIGHT_TYPE_SIZE;
-                const GlowMode newGlowMode = { 137,0,0,127 };
+                const GlowMode newGlowMode = { 0,125,64,64 };
                 for (int highlightId = MinimumItemRarity; highlightId < 39; highlightId++)
                 {
                     const GlowMode oldGlowMode = mem.Read<GlowMode>(highlightSettingsPtr + (highlightSize * highlightId) + 0, true);
@@ -109,7 +108,6 @@ struct Sense {
 
         for (int i = 0; i < Players->size(); i++) {
             Player* Target = Players->at(i);
-            std::cout << Target->IsVisible << "555/n";
             if (!Target->IsValid()) continue;
             if (Target->IsDummy()) continue;
             if (Target->IsLocal) continue;
