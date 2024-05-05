@@ -191,6 +191,9 @@ struct LocalPlayer {
             uint64_t skydrivestateAddress = BasePointer + OFF_SKYDRIVESTATE;
             mem.AddScatterReadRequest(handle, skydrivestateAddress, &skyDriveState, sizeof(int));
 
+            uint64_t spaceFlagAddress = BasePointer + OFF_FLAGS;
+            mem.AddScatterReadRequest(handle, spaceFlagAddress, &spaceFlag, sizeof(int));
+
             uint64_t inbackwardAddress = mem.OFF_BASE + OFF_IN_BACKWARD;
             mem.AddScatterReadRequest(handle, inbackwardAddress, &backWardState, sizeof(int));
 

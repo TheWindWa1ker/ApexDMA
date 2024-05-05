@@ -41,8 +41,8 @@ struct ActionHelper {
                 if (Myself->TimeBase > Myself->wallrunClear + 0.1)
                     longclimb = false;
             }
-            // when player is in air  and  not skydrive    and  not longclimb and not backward
-            if (((Myself->spaceFlag & 0x1) == 0) && !(Myself->skyDriveState > 0) && !longclimb && !(Myself->backWardState > 0))
+            // when player is in air  and                       not skydrive    and  not longclimb and   not backward
+            if (((Myself->spaceFlag & 0x1)== 0) && !(Myself->skyDriveState > 0) && !longclimb && !(Myself->backWardState > 0))
             {
                 if (((Myself->duckState > 0) && (Myself->forewardState == 33))) { //previously 33
                     if (Myself->forceForeward == 0) {
@@ -53,13 +53,13 @@ struct ActionHelper {
                     }
                 }
             }
-            //else if ((Myself->spaceFlag & 0x1) != 0) {
+            else if ((Myself->spaceFlag & 0x1) != 0) {
                 if (Myself->forewardState == 33) {
                     mem.Write<int>(mem.OFF_BASE + OFF_IN_FORWARD + 0x8, 1);
                 }
                 else if (Myself->forewardState == 0) {
                     mem.Write<int>(mem.OFF_BASE + OFF_IN_FORWARD + 0x8, 0);
-                
+                }
             }
         }
     
