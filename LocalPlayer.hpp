@@ -127,48 +127,6 @@ struct LocalPlayer {
         // Close the scatter handle
         mem.CloseScatterHandle(handle);
 
-        if (!IsDead && !IsKnocked && WeaponHandle) {
-            uint64_t WeaponHandleMasked = WeaponHandle & 0xffff;
-            uint64_t WeaponEntity = mem.Read<uint64_t>(mem.OFF_BASE + OFF_ENTITY_LIST + (WeaponHandleMasked << 5), true);
-
-            IsHoldingGrenade = OffHandWeaponID == -251 ? true : false;
-
-            auto handle = mem.CreateScatterHandle();
-
-            // Scatter read request for ZoomFOV
-            uint64_t zoomFOVAddress = WeaponEntity + OFF_CURRENTZOOMFOV;
-            mem.AddScatterReadRequest(handle, zoomFOVAddress, &ZoomFOV, sizeof(float));
-
-            // Scatter read request for TargetZoomFOV
-            uint64_t targetZoomFOVAddress = WeaponEntity + OFF_TARGETZOOMFOV;
-            mem.AddScatterReadRequest(handle, targetZoomFOVAddress, &TargetZoomFOV, sizeof(float));
-
-            // Scatter read request for WeaponIndex
-            uint64_t weaponIndexAddress = WeaponEntity + OFF_WEAPON_INDEX;
-            mem.AddScatterReadRequest(handle, weaponIndexAddress, &WeaponIndex, sizeof(int));
-
-            // Scatter read request for WeaponProjectileSpeed
-            uint64_t weaponProjectileSpeedAddress = WeaponEntity + OFF_PROJECTILESPEED;
-            mem.AddScatterReadRequest(handle, weaponProjectileSpeedAddress, &WeaponProjectileSpeed, sizeof(float));
-
-            // Scatter read request for WeaponProjectileScale
-            uint64_t weaponProjectileScaleAddress = WeaponEntity + OFF_PROJECTILESCALE;
-            mem.AddScatterReadRequest(handle, weaponProjectileScaleAddress, &WeaponProjectileScale, sizeof(float));
-
-            // Scatter read request for Weapon Ammo
-            uint64_t weaponAmmoAddress = WeaponEntity + OFF_WEAPON_AMMO;
-            mem.AddScatterReadRequest(handle, weaponAmmoAddress, &Ammo, sizeof(int));
-
-            // Scatter read request for IsReloading
-            uint64_t isReloadingAddress = WeaponEntity + OFF_RELOADING;
-            mem.AddScatterReadRequest(handle, isReloadingAddress, &IsReloading, sizeof(bool));
-
-            // Execute the scatter read
-            mem.ExecuteReadScatter(handle);
-
-            // Close the scatter handle
-            mem.CloseScatterHandle(handle);
-        }
         if (!IsDead && !IsKnocked) {
 
             auto handle = mem.CreateScatterHandle();
@@ -205,6 +163,43 @@ struct LocalPlayer {
 
             uint64_t inforceforwardAddress = mem.OFF_BASE + OFF_IN_FORWARD + 0x8;
             mem.AddScatterReadRequest(handle, inforceforwardAddress, &forceForeward, sizeof(int));
+
+            if (WeaponHandle) {
+                uint64_t WeaponHandleMasked = WeaponHandle & 0xffff;
+                uint64_t WeaponEntity = mem.Read<uint64_t>(mem.OFF_BASE + OFF_ENTITY_LIST + (WeaponHandleMasked << 5), true);
+
+                IsHoldingGrenade = OffHandWeaponID == -251 ? true : false;
+
+                //auto handle = mem.CreateScatterHandle();
+
+                // Scatter read request for ZoomFOV
+                uint64_t zoomFOVAddress = WeaponEntity + OFF_CURRENTZOOMFOV;
+                mem.AddScatterReadRequest(handle, zoomFOVAddress, &ZoomFOV, sizeof(float));
+
+                // Scatter read request for TargetZoomFOV
+                uint64_t targetZoomFOVAddress = WeaponEntity + OFF_TARGETZOOMFOV;
+                mem.AddScatterReadRequest(handle, targetZoomFOVAddress, &TargetZoomFOV, sizeof(float));
+
+                // Scatter read request for WeaponIndex
+                uint64_t weaponIndexAddress = WeaponEntity + OFF_WEAPON_INDEX;
+                mem.AddScatterReadRequest(handle, weaponIndexAddress, &WeaponIndex, sizeof(int));
+
+                // Scatter read request for WeaponProjectileSpeed
+                uint64_t weaponProjectileSpeedAddress = WeaponEntity + OFF_PROJECTILESPEED;
+                mem.AddScatterReadRequest(handle, weaponProjectileSpeedAddress, &WeaponProjectileSpeed, sizeof(float));
+
+                // Scatter read request for WeaponProjectileScale
+                uint64_t weaponProjectileScaleAddress = WeaponEntity + OFF_PROJECTILESCALE;
+                mem.AddScatterReadRequest(handle, weaponProjectileScaleAddress, &WeaponProjectileScale, sizeof(float));
+
+                // Scatter read request for Weapon Ammo
+                uint64_t weaponAmmoAddress = WeaponEntity + OFF_WEAPON_AMMO;
+                mem.AddScatterReadRequest(handle, weaponAmmoAddress, &Ammo, sizeof(int));
+
+                // Scatter read request for IsReloading
+                uint64_t isReloadingAddress = WeaponEntity + OFF_RELOADING;
+                mem.AddScatterReadRequest(handle, isReloadingAddress, &IsReloading, sizeof(bool));
+            }
 
             // Execute the scatter read
             mem.ExecuteReadScatter(handle);

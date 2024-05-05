@@ -28,6 +28,7 @@
 struct Aimbot {
     bool PredictMovement = true;
     bool PredictBulletDrop = true;
+    bool weap_click = false;
 
     float FinalDistance = 0;
 
@@ -38,11 +39,12 @@ struct Aimbot {
     float ZoomScale = 1.2;
     float MinDistance = 0;
     float HipfireDistance = 50;
-    float ZoomDistance = 300;
+    float ZoomDistance = 250;
     int MinimumDelay = 1;
     float RecoilCompensation = 1.0f;
 
     int AimBotKey = 0x02;
+    int AimBotKey2 = 0xA0;
     int AimTriggerKey = 0x05;
     int AimFlickKey = 0x06;
 
@@ -61,6 +63,47 @@ struct Aimbot {
     }
 
     std::array<int, 4> Shotguns = { 105, 97, 98, 89 };
+    std::array<int, 15> Clickguns = { 1, 86, 89, 91, 92, 94, 98, 97, 103, 105, 107, 109, 111, 113, 115 };
+    enum weapon_id : int32_t {
+        idweapon_r301 = 0,
+        idweapon_sentinel = 1,
+        idweapon_bow = 2,
+        idsheila_stationary = 14,
+        idsheila = 58,
+        idweapon_rampage = 6,
+        idmelee = 116,
+        idsnipers_mark = 78,
+        idweapon_alternator = 81,
+        idweapon_re45 = 82,
+        idweapon_charge_rifle = 84,
+        idweapon_devotion = 95,
+        idweapon_longbow = 86,
+        idweapon_havoc = 87,
+        idweapon_eva8 = 89,
+        idweapon_flatline = 90,
+        idweapon_g7_scout = 91,
+        idweapon_hemlock = 92,
+        idweapon_kraber = 94,
+        idweapon_lstar = 95,
+        idweapon_mastiff = 97,
+        idweapon_mozambique = 98,
+        idweapon_prowler = 103,
+        idweapon_peacekeeper = 105,
+        idweapon_r99 = 106,
+        idweapon_p2020 = 107,
+        idweapon_spitfire = 108,
+        idweapon_triple_take = 109,
+        idweapon_wingman = 111,
+        idweapon_volt = 112,
+        idweapon_3030_repeater = 113,
+        idweapon_car_smg = 114,
+        idweapon_nemesis = 115,
+        idthrowing_knife = 169,
+        idgrenade_thermite = 170,
+        idgrenade_frag = 171,
+        idgrenade_arc_star = 172,
+        idmax
+    };
 
     std::string KmboxType = "Net";
     char KmboxIP[24] = "192.168.2.188";
@@ -152,13 +195,22 @@ struct Aimbot {
 	}
 
     void Update_Aimbot() {
+        float smooth = Smooth;
         if (Myself->IsZooming)
             FinalDistance = ZoomDistance;
         else FinalDistance = HipfireDistance;
         if (mem.GetKeyboard()->IsKeyDown(AimTriggerKey)) { return; }
 
         if (!Myself->IsCombatReady()) { CurrentTarget = nullptr; return; }
-        if (!mem.GetKeyboard()->IsKeyDown(AimBotKey) && !mem.GetKeyboard()->IsKeyDown(AimFlickKey) && !Myself->IsInAttack) { ReleaseTarget(); return; }
+
+        weap_click = std::find(Clickguns.begin(), Clickguns.end(), Myself->WeaponIndex) != Clickguns.end();
+        if (weap_click){
+            if (!mem.GetKeyboard()->IsKeyDown(AimBotKey2) && !mem.GetKeyboard()->IsKeyDown(AimFlickKey)) { ReleaseTarget(); return; }
+            smooth = (smooth - 2 > 0) ? smooth - 2 : 2;
+        }
+        else {
+            if (!mem.GetKeyboard()->IsKeyDown(AimBotKey) && !mem.GetKeyboard()->IsKeyDown(AimFlickKey) && !Myself->IsInAttack) { ReleaseTarget(); return; }
+        }
         if (Myself->IsHoldingGrenade) { ReleaseTarget(); return; }
 
         Player* Target = CurrentTarget;
@@ -194,20 +246,20 @@ struct Aimbot {
         if (TargetSelected && CurrentTarget) {
             std::chrono::milliseconds Now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
             if (Now >= LastAimTime + std::chrono::milliseconds(10)) {
-                StartAiming(CurrentTarget);
+                StartAiming(CurrentTarget, smooth);
                 LastAimTime = Now + std::chrono::milliseconds((int)Utils::RandomRange(MinimumDelay, 10));
             }
             return;
         }
     }
 
-    void StartAiming(Player* Target) {
+    void StartAiming(Player* Target, float smooth) {
         Vector3D TargetPosition = CalculatePredictedPosition(Target->GetBonePosition(static_cast<HitboxType>(GetBestBone(Target))), Target->AbsoluteVelocity, Myself->WeaponProjectileSpeed, Myself->WeaponProjectileScale);
         Vector2D ScreenPosition = { 0, 0 };
         if (GameCamera->WorldToScreen(TargetPosition, ScreenPosition)) {
             Vector2D Center = GameCamera->GetCenter();
             Vector2D RelativePosition = { ScreenPosition.x - Center.x, ScreenPosition.y - Center.y };
-            float baseSmoothing = Smooth; // Base smoothing factor
+            float baseSmoothing = smooth; // Base smoothing factor
             float baseFOV = FOV; // Base field of view
             float maxPercentageIncrease = MaxSmoothIncrease; // Maximum increase is 20% of the base smoothing
             float maxIncrease = baseSmoothing * maxPercentageIncrease; // Absolute max increase in smoothing
