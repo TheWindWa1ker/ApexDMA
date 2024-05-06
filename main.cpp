@@ -96,9 +96,19 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
         // Verify that the BasePointer is not 0 before adding scatter read requests
         if (mem.IsValidPointer(player->BasePointer)) {
             // Scatter read request for NameBuffer
-            uint64_t nameBufferAddress = player->BasePointer + OFF_NAME;
-            mem.AddScatterReadRequest(handle, nameBufferAddress, player->NameBuffer, sizeof(player->NameBuffer));
+            uintptr_t nameIndex, nameOffset;
+            uint64_t nameIndexAddress = player->BasePointer + OFF_NAME_INDEX;
+            mem.AddScatterReadRequest(handle, nameIndexAddress, &nameIndex, sizeof(uintptr_t));
+            uint64_t nameOffAddress = mem.OFF_BASE + OFF_NAME_LIST + ((nameIndex - 1) * 24);
+            mem.AddScatterReadRequest(handle, nameOffAddress, &nameOffset, sizeof(uintptr_t));
+            mem.AddScatterReadRequest(handle, nameOffset, player->NameBuffer, sizeof(player->NameBuffer));
 
+            //Scatter read request for Player_UID
+            uint64_t uesrIDAddress = player->BasePointer + OFF_PLATFORM_UID;
+            mem.AddScatterReadRequest(handle, uesrIDAddress, &player->PlayerID, sizeof(uint64_t));
+            // Scatter read request for NameClass
+            uint64_t nameBufferAddress = player->BasePointer + OFF_NAME;
+            mem.AddScatterReadRequest(handle, nameBufferAddress, &player->NameClass, sizeof(uint64_t));
             // Scatter read request for Team
             uint64_t teamAddress = player->BasePointer + OFF_TEAM_NUMBER;
             mem.AddScatterReadRequest(handle, teamAddress, &player->Team, sizeof(int));
@@ -112,7 +122,7 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
         Player* player = players[i];
         if (player->BasePointer != 0) {
             // Convert the NameBuffer to a std::string for the Name field
-            player->NameClass = std::string(player->NameBuffer);
+            player->PlayerName = std::string(player->NameBuffer);
         }
     }
 
@@ -302,6 +312,7 @@ void UpdateCore() {
                     for (int i = 0; i < HumanPlayers->size(); i++) {
                         Player* p = HumanPlayers->at(i);
                         if (p->BasePointer != 0 && (p->IsPlayer() || p->IsDummy()))
+                            //std::cout << p->PlayerName <<p->PlayerID<< std::endl;
                             Players->push_back(p);
                     }
                 }

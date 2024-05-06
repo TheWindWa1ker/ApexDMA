@@ -20,9 +20,11 @@ struct Player {
 
     uint64_t BonePointer = 0;
 
-    char NameBuffer[8] = { 0 };
-    std::string NameClass;
+    char NameBuffer[64] = { 0 };
+    std::string PlayerName;
+    uint64_t NameClass = 0;
     int Team;
+    uint64_t PlayerID;
 
     int GlowEnable;
     int GlowThroughWall;
@@ -153,7 +155,7 @@ struct Player {
     }
 
     bool IsPlayer() {
-        return NameClass == "player";
+        return NameClass == 125780153691248;
     }
 
     bool IsDummy() {
