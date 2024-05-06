@@ -112,7 +112,7 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
         Player* player = players[i];
         if (player->BasePointer != 0) {
             // Convert the NameBuffer to a std::string for the Name field
-            player->Name = std::string(player->NameBuffer);
+            player->NameClass = std::string(player->NameBuffer);
         }
     }
 

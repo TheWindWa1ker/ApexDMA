@@ -59,7 +59,7 @@ constexpr uint64_t OFF_PROJECTILESPEED = 0x19c0 + 0x04e4;         //[WeaponSetti
 constexpr uint64_t OFF_OFFHAND_WEAPON = 0x1944;                   //[DataMap.C_BaseCombatCharacter].m_latestNonOffhandWeapons updated 2024/05/03
 constexpr uint64_t OFF_CURRENTZOOMFOV = 0x15d0 + 0x00b8;          //[RecvTable.DT_WeaponX].m_playerData + m_curZoomFOV updated 2024/05/03
 constexpr uint64_t OFF_TARGETZOOMFOV = 0x15d0 + 0x00bc;           //[RecvTable.DT_WeaponX].m_playerData + [RecvTable.DT_WeaponPlayerData].m_targetZoomFOV updated 2024/05/03
-constexpr uint64_t OFF_WEAPON_AMMO = 0x1554;                      //[RecvTable.DT_PropSurvival].m_ammoInClip updated 2024/05/03
+constexpr uint64_t OFF_WEAPON_AMMO = 0x1580;                      //[RecvTable.DT_WeaponX_LocalWeaponData].m_ammoInClip updated 2024/05/03
 constexpr uint64_t OFF_RELOADING = 0x159a;						  //[RecvTable.DT_WeaponX_LocalWeaponData].m_bInReload updated 2024/05/03
 
 constexpr uint64_t OFF_GLOW_HIGHLIGHTS = 0xBB247D0;               //HighlightSettings updated 2024/04/09

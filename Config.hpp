@@ -60,6 +60,7 @@ public:
         configFile << "AimSmoothMaxIncrease=" << AimAssistance->MaxSmoothIncrease << std::endl;
         configFile << "AimRecoilCompensation=" << AimAssistance->RecoilCompensation << std::endl;
         configFile << "AimBotKey=" << AimAssistance->AimBotKey << std::endl;
+        configFile << "AimBotKey2=" << AimAssistance->AimBotKey2 << std::endl;
         configFile << "AimTriggerKey=" << AimAssistance->AimTriggerKey << std::endl;
         configFile << "AimFlickKey=" << AimAssistance->AimFlickKey << std::endl;
         configFile << "GlowItem=" << (ESP->ItemGlow ? "true" : "false") << std::endl;
@@ -99,28 +100,31 @@ private:
                 AimAssistance->Sticky = false;
             }
 		}
-        if (key == "AimFOV") {
+        else if (key == "AimFOV") {
 			AimAssistance->FOV = std::stof(value);
 		}
-        if (key == "AimSmooth") {
+        else if (key == "AimSmooth") {
             AimAssistance->Smooth = std::stof(value);
         }
-        if (key == "AimSmoothMaxIncrease") {
+        else if (key == "AimSmoothMaxIncrease") {
             AimAssistance->MaxSmoothIncrease = std::stof(value);
 		}
-        if (key == "AimRecoilCompensation") {
+        else if (key == "AimRecoilCompensation") {
             AimAssistance->RecoilCompensation = std::stof(value);
         }
-        if (key == "AimBotKey") {
+        else if (key == "AimBotKey") {
 			AimAssistance->AimBotKey = std::stoi(value);
 		}
-		if (key == "AimTriggerKey") {
+        else if (key == "AimBotKey2") {
+            AimAssistance->AimBotKey2 = std::stoi(value);
+        }
+        else if (key == "AimTriggerKey") {
 			AimAssistance->AimTriggerKey = std::stoi(value);
 		}
-        if (key == "AimFlickKey") {
+        else if (key == "AimFlickKey") {
             AimAssistance->AimFlickKey = std::stoi(value);
         }
-		if (key == "GlowItem") {
+        else if (key == "GlowItem") {
             if (value == "true") {
                 ESP->ItemGlow = true;
             }
@@ -128,40 +132,40 @@ private:
                 ESP->ItemGlow = false;
             }
 		}
-        if (key == "GlowItemRarity") {
+        else if (key == "GlowItemRarity") {
 			ESP->MinimumItemRarity = std::stoi(value);
 		}
-        if (key == "ResolutionX") {
+        else if (key == "ResolutionX") {
 			GameCamera->ScreenSize.x = std::stoi(value);
 		}
-        if (key == "ResolutionY") {
+        else if (key == "ResolutionY") {
             GameCamera->ScreenSize.y = std::stoi(value);
         }
-        if (key == "FOV") {
+        else if (key == "FOV") {
 			GameCamera->FOV = std::stof(value);
 		}
-        if (key == "KmboxType") {
+        else if (key == "KmboxType") {
 			AimAssistance->KmboxType = value;
 		}
-        if (key == "KmboxIP") {
+        else if (key == "KmboxIP") {
             // Ensure we don't exceed the buffer size, including space for the null terminator
             std::strncpy(AimAssistance->KmboxIP, value.c_str(), sizeof(AimAssistance->KmboxIP) - 1);
             // Ensure null termination
             AimAssistance->KmboxIP[sizeof(AimAssistance->KmboxIP) - 1] = '\0';
         }
-        if (key == "KmboxPort") {
+        else if (key == "KmboxPort") {
 			// Ensure we don't exceed the buffer size, including space for the null terminator
             std::strncpy(AimAssistance->KmboxPort, value.c_str(), sizeof(AimAssistance->KmboxPort) - 1);
 			// Ensure null termination
 			AimAssistance->KmboxPort[sizeof(AimAssistance->KmboxPort) - 1] = '\0';
 		}
-        if (key == "KmboxUUID") {
+        else if (key == "KmboxUUID") {
 			// Ensure we don't exceed the buffer size, including space for the null terminator
 			std::strncpy(AimAssistance->KmboxUUID, value.c_str(), sizeof(AimAssistance->KmboxUUID) - 1);
 			// Ensure null termination
 			AimAssistance->KmboxUUID[sizeof(AimAssistance->KmboxUUID) - 1] = '\0';
         }
-        if (key == "KmboxComPort") {
+        else if (key == "KmboxComPort") {
             AimAssistance->KmboxComPort = std::stoi(value);
         }
     }

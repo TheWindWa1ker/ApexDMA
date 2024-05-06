@@ -40,6 +40,9 @@ const char* keyNames[] = {
     "Middle Mouse Button",
     "Side1 Mouse Button",
     "Side2 Mouse Button",
+    "Left SHIFT Button",
+    "Left ALT Button",
+    "OFF",
 };
 int keyValues[] = {
     0x01, // Left Mouse Button
@@ -47,6 +50,9 @@ int keyValues[] = {
     0x04, // Middle Mouse Button
     0x05, // Side1 Mouse Button
     0x06, // Side2 Mouse Button
+    0xA0, // Left SHIFT Button
+    0xA4, // Left ALT Button
+    0x2A, // A button that is rarely used instead off
 };
 constexpr int keyCount = sizeof(keyNames) / sizeof(keyNames[0]);
 
@@ -156,17 +162,17 @@ void Render(LocalPlayer* Myself, std::vector<Player*>* Players, Camera* GameCame
         fg_draw->AddText(ImVec2(10, 50), IM_COL32(255, 255, 255, 255), PerformanceString.c_str());
 
         // Settings Window, Fixed Width
-        ImGui::SetNextWindowSize(ImVec2(400, 430), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(400, 430), ImGuiCond_FirstUseEver);  // ImGuiCond_FirstUseEver 仅当窗口第一次被使用时才应用这个设置
         ImGui::SetNextWindowPos(ImVec2(width - 410, 10), ImGuiCond_FirstUseEver);
         ImGui::Begin("Settings");
         // AimAssist Settings
-        ImGui::PushFont(huge_font);
+        ImGui::PushFont(huge_font);  // 通过将字体推入堆栈，可以暂时改变当前的字体，直到它从堆栈中弹出为止
         ImGui::Text("AimAssist Settings");
         ImGui::PopFont();
         ImGui::Text("Sticky Aim:");
-        ImGui::SameLine();
-        if (ImGui::Checkbox("##Sticky Aim:", &AimAssist->Sticky)) {
-            Config::GetInstance().Save();
+        ImGui::SameLine();  // 得接下来的文本或控件与前面的文本处于同一行
+        if (ImGui::Checkbox("##Sticky Aim:", &AimAssist->Sticky)) {  // 标签字符串前面添加了 "##"，因此该字符串不会显示在界面上
+            Config::GetInstance().Save();  // 复选框与布尔变量 AimAssist->Sticky 关联 复选框的状态发生变化，则条件成立
         }
         ImGui::Text("Aim FOV:");
         if (ImGui::SliderFloat("##Aim FOV:", &AimAssist->FOV, 1.0f, 50.0f, "% .1f")) {
@@ -190,6 +196,14 @@ void Render(LocalPlayer* Myself, std::vector<Player*>* Players, Camera* GameCame
         ImGui::Text("AimBot Key:");
         if (ImGui::Combo("##AimBotKey", &aimBotKeyIndex, keyNames, keyCount)) {
             AimAssist->AimBotKey = keyValues[aimBotKeyIndex];
+            Config::GetInstance().Save();
+        }
+
+        // For AimBotKey2
+        int aimBotKey2Index = FindCurrentSelectionIndex(AimAssist->AimBotKey2, keyValues, keyCount);
+        ImGui::Text("AimBot Key2:");
+        if (ImGui::Combo("##AimBotKey2", &aimBotKey2Index, keyNames, keyCount)) {
+            AimAssist->AimBotKey2 = keyValues[aimBotKey2Index];
             Config::GetInstance().Save();
         }
 
@@ -229,7 +243,7 @@ void Render(LocalPlayer* Myself, std::vector<Player*>* Players, Camera* GameCame
 
         // Rendering
         ImGui::Render();
-        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w }; // rgba ->x,y,z,w
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
         g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

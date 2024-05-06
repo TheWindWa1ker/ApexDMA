@@ -21,7 +21,7 @@ struct Player {
     uint64_t BonePointer = 0;
 
     char NameBuffer[8] = { 0 };
-    std::string Name;
+    std::string NameClass;
     int Team;
 
     int GlowEnable;
@@ -153,7 +153,7 @@ struct Player {
     }
 
     bool IsPlayer() {
-        return Name == "player";
+        return NameClass == "player";
     }
 
     bool IsDummy() {

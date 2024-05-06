@@ -206,7 +206,7 @@ struct Aimbot {
         weap_click = std::find(Clickguns.begin(), Clickguns.end(), Myself->WeaponIndex) != Clickguns.end();
         if (weap_click){
             if (!mem.GetKeyboard()->IsKeyDown(AimBotKey2) && !mem.GetKeyboard()->IsKeyDown(AimFlickKey)) { ReleaseTarget(); return; }
-            smooth = (smooth - 2 > 0) ? smooth - 2 : 2;
+            smooth = (smooth - 1.5 > 0) ? smooth - 1.5 : 2;
         }
         else {
             if (!mem.GetKeyboard()->IsKeyDown(AimBotKey) && !mem.GetKeyboard()->IsKeyDown(AimFlickKey) && !Myself->IsInAttack) { ReleaseTarget(); return; }
