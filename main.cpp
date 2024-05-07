@@ -85,7 +85,7 @@ void PlayerBasePointerScatter(std::vector<Player*>& players) {
     mem.CloseScatterHandle(handle);
 }
 
-// 获取所有玩家的队伍id和是否player、名字（希望能用）
+// 获取所有玩家的队伍id和是否player、nameIndex
 void ScatterReadTeamAndName(std::vector<Player*>& players) {
     // Create scatter handle
     auto handle = mem.CreateScatterHandle();
@@ -96,12 +96,8 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
         // Verify that the BasePointer is not 0 before adding scatter read requests
         if (mem.IsValidPointer(player->BasePointer)) {
             // Scatter read request for NameBuffer
-            uintptr_t nameIndex, nameOffset;
             uint64_t nameIndexAddress = player->BasePointer + OFF_NAME_INDEX;
-            mem.AddScatterReadRequest(handle, nameIndexAddress, &nameIndex, sizeof(uintptr_t));
-            uint64_t nameOffAddress = mem.OFF_BASE + OFF_NAME_LIST + ((nameIndex - 1) * 24);
-            mem.AddScatterReadRequest(handle, nameOffAddress, &nameOffset, sizeof(uintptr_t));
-            mem.AddScatterReadRequest(handle, nameOffset, player->NameBuffer, sizeof(player->NameBuffer));
+            mem.AddScatterReadRequest(handle, nameIndexAddress, &player->nameIndex, sizeof(uint64_t));
 
             //Scatter read request for Player_UID
             uint64_t uesrIDAddress = player->BasePointer + OFF_PLATFORM_UID;
@@ -116,16 +112,6 @@ void ScatterReadTeamAndName(std::vector<Player*>& players) {
     }
     // Execute the scatter read
     mem.ExecuteReadScatter(handle);
-
-    // Convert NameBuffer to a std::string for the Name field
-    for (size_t i = 0; i < players.size(); ++i) {
-        Player* player = players[i];
-        if (player->BasePointer != 0) {
-            // Convert the NameBuffer to a std::string for the Name field
-            player->PlayerName = std::string(player->NameBuffer);
-        }
-    }
-
     // Close the scatter handle
     mem.CloseScatterHandle(handle);
 }
@@ -142,6 +128,8 @@ void ScatterReadPlayerValidity(std::vector <Player*>& players) {
 			// Scatter read request for IsPlayer
 			uint64_t validAddress = player->BasePointer;
 			mem.AddScatterReadRequest(handle, validAddress, &player->Valid, sizeof(uint64_t));
+            uint64_t nameOffAddress = mem.OFF_BASE + OFF_NAME_LIST + ((player->nameIndex - 1) * 24);
+            mem.AddScatterReadRequest(handle, nameOffAddress, &player->nameOffset, sizeof(uint64_t));
 		}
 	}
 
@@ -176,6 +164,8 @@ void ScatterReadPlayerAttributes(std::vector<Player*>& players) {
                 // Scatter read request for IsDead
                 uint64_t isDeadAddress = player->BasePointer + OFF_LIFE_STATE;
                 mem.AddScatterReadRequest(handle, isDeadAddress, &player->IsDead, sizeof(bool));
+
+                mem.AddScatterReadRequest(handle, player->nameOffset, player->NameBuffer, sizeof(player->NameBuffer));
 
                 // Scatter read request for IsKnocked
                 uint64_t isKnockedAddress = player->BasePointer + OFF_BLEEDOUT_STATE;
@@ -326,7 +316,7 @@ void UpdateCore() {
 
             // Update Player Attributes
             ScatterReadPlayerAttributes(*Players);
-
+            
             // Update Camera
             GameCamera->Update();
 

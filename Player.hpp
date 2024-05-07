@@ -14,6 +14,8 @@ struct Player {
     Level* Map;
 
     int Index;
+    uint64_t nameIndex;
+    uint64_t nameOffset;
     uint64_t BasePointer = 0;
 
     uint64_t ModelPointer = 0;
@@ -129,7 +131,8 @@ struct Player {
 
         IsAimedAt = LastTimeAimedAtPrevious < LastTimeAimedAt;
         LastTimeAimedAtPrevious = LastTimeAimedAt;
-
+        // Convert NameBuffer to a std::string for the Name field
+        PlayerName = std::string(NameBuffer);
         IsVisible = IsDummy() || IsAimedAt || VisCheck2();
 
         if (Myself->IsValid()) {
@@ -142,7 +145,7 @@ struct Player {
         }
     }
 
-    bool IsValid() {
+    bool IsValid() const {
         return mem.IsValidPointer(BasePointer) && !IsDead && Health > 0 && (IsPlayer() || IsDummy() && Map->IsFiringRange);
     }
 
@@ -154,11 +157,11 @@ struct Player {
         return true;
     }
 
-    bool IsPlayer() {
+    bool IsPlayer() const {
         return NameClass == 125780153691248;
     }
 
-    bool IsDummy() {
+    bool IsDummy() const {
         return Team == 97;
     }
 
